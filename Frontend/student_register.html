@@ -1,57 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Registration</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Registration</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <header>
-  <div class="container nav">
-    <strong>ERP System</strong>
-    <nav style="margin-left:18px">
-      <a href="login.html">Login</a>
-      <a href="admission.html">Admission</a>
-    </nav>
-  </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="#">ERP System</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="admission.html">Admission</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 </header>
 
-<div class="container">
-  <h2>Student Self-Registration</h2>
+<div class="container my-4">
+  <h2 class="mb-3">Student Self-Registration</h2>
 
-  <div class="card">
-    <form id="regForm">
-      Full Name:<br>
-      <input type="text" name="full_name" id="full_name" required><br><br>
+  <div class="card p-3">
+    <form id="regForm" class="mx-auto" style="max-width:700px;">
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input class="form-control" type="text" name="full_name" id="full_name" required>
+      </div>
 
-      Date of Birth:<br>
-      <input type="date" name="dob" id="dob" required><br><br>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Date of Birth</label>
+          <input class="form-control" type="date" name="dob" id="dob" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Gender</label>
+          <select class="form-select" name="gender" id="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
 
-      Gender:<br>
-      <select name="gender" id="gender">
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-      </select><br><br>
+      <div class="mb-3">
+        <label class="form-label">Department</label>
+        <input class="form-control" type="text" name="department" id="department" required>
+      </div>
 
-      Department:<br>
-      <input type="text" name="department" id="department" required><br><br>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Year</label>
+          <input class="form-control" type="number" name="year" id="year" required min="1">
+        </div>
+        <div class="col-md-8 mb-3">
+          <label class="form-label">Email</label>
+          <input class="form-control" type="email" name="email" id="email">
+        </div>
+      </div>
 
-      Year:<br>
-      <input type="number" name="year" id="year" required min="1"><br><br>
+      <div class="mb-3">
+        <label class="form-label">Mobile</label>
+        <input class="form-control" type="text" name="mobile" id="mobile">
+      </div>
 
-      Email:<br>
-      <input type="email" name="email" id="email"><br><br>
-
-      Mobile:<br>
-      <input type="text" name="mobile" id="mobile"><br><br>
-
-      <button class="btn" type="submit">Register</button>
+      <button class="btn btn-primary" type="submit">Register</button>
     </form>
   </div>
 
-  <div id="result" style="margin-top:12px"></div>
+  <div id="result" class="mt-3"></div>
 
-  <div class="footer">After registration you'll receive your Student ID and password (DOB).</div>
+  <div class="footer mt-3">After registration you'll receive your Student ID and password (DOB).</div>
 </div>
 
 <script>
