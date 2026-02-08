@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <strong>ERP System - Student Portal</strong>
+    <nav style="margin-left:18px">
+      <a href="student_dashboard.html">Dashboard</a>
+      <a href="login.html" onclick="logout(); return false;">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+    <div class="top-actions"><button class="btn" onclick="logout()">Logout</button></div>
+
+<h1>Student Dashboard</h1>
+
+<p id="loadingMsg" style="text-align:center; color:#666;">Loading your data...</p>
+
+<div class="box">
+    <h2>Student Details</h2>
+    <p><b>ID:</b> <span id="sid"></span></p>
+    <p><b>Name:</b> <span id="name"></span></p>
+    <p><b>Department:</b> <span id="dept"></span></p>
+    <p><b>Year:</b> <span id="year"></span></p>
+</div>
+
+<div class="box">
+    <h2>Fee Details</h2>
+    <ul id="fees"></ul>
+</div>
+
+<div class="box">
+    <h2>Hostel Status</h2>
+    <p id="hostel"></p>
+</div>
+
+<div class="footer">ERP Frontend • Student Dashboard</div>
+</div>
+
+<script>
+function logout() {
+    fetch('http://127.0.0.1:5000/logout', {
+        method: 'POST',
+        credentials: 'include'
+    })
+    .then(() => {
+        localStorage.removeItem('current_user');
+        window.location.href = 'login.html';
+    })
+    .catch(err => {
+        console.error(err);
+        window.location.href = 'login.html';
+    });
+}
+
+function loadStudentData() {
+    const params = new URLSearchParams(window.location.search);
+    const student_id = params.get("student_id");
+
+    if (!student_id) {
+        document.getElementById("loadingMsg").innerText = "No student ID. Redirecting to login...";
+        setTimeout(() => window.location.href = 'login.html', 2000);
+        return;
+    }
+
+    fetch(`http://127.0.0.1:5000/student_dashboard?student_id=${student_id}`, {
+        credentials: 'include'
+    })
+    .then(res => {
+        if (res.status === 401 || res.status === 403) {
+            window.location.href = 'login.html';
+            return;
+        }
+        return res.json();
+    })
+    .then(data => {
+        document.getElementById("loadingMsg").style.display = 'none';
+        
+        if (data.student) {
+            document.getElementById("sid").innerText = data.student.student_id;
+            document.getElementById("name").innerText = data.student.full_name;
+            document.getElementById("dept").innerText = data.student.department;
+            document.getElementById("year").innerText = data.student.year;
+        }
+
+        let feeList = "";
+        if (data.fees && data.fees.length > 0) {
+            data.fees.forEach(f => {
+                feeList += `<li>${f.fee_type} - ₹${f.amount} (${f.payment_date})</li>`;
+            });
+        } else {
+            feeList = "<li>No fee records</li>";
+        }
+        document.getElementById("fees").innerHTML = feeList;
+
+        if (data.hostel) {
+            document.getElementById("hostel").innerText =
+                `${data.hostel.hostel_name}, Room ${data.hostel.room_no} (${data.hostel.status})`;
+        } else {
+            document.getElementById("hostel").innerText = "Not allocated";
+        }
+    })
+    .catch(err => {
+        document.getElementById("loadingMsg").innerText = 'Error loading data. Check backend.';
+        console.error(err);
+    });
+}
+
+// On page load
+loadStudentData();
+</script>
+
+</body>
+</html>
+

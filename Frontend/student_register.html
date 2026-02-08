@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <strong>ERP System</strong>
+    <nav style="margin-left:18px">
+      <a href="login.html">Login</a>
+      <a href="admission.html">Admission</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h2>Student Self-Registration</h2>
+
+  <div class="card">
+    <form id="regForm">
+      Full Name:<br>
+      <input type="text" name="full_name" id="full_name" required><br><br>
+
+      Date of Birth:<br>
+      <input type="date" name="dob" id="dob" required><br><br>
+
+      Gender:<br>
+      <select name="gender" id="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select><br><br>
+
+      Department:<br>
+      <input type="text" name="department" id="department" required><br><br>
+
+      Year:<br>
+      <input type="number" name="year" id="year" required min="1"><br><br>
+
+      Email:<br>
+      <input type="email" name="email" id="email"><br><br>
+
+      Mobile:<br>
+      <input type="text" name="mobile" id="mobile"><br><br>
+
+      <button class="btn" type="submit">Register</button>
+    </form>
+  </div>
+
+  <div id="result" style="margin-top:12px"></div>
+
+  <div class="footer">After registration you'll receive your Student ID and password (DOB).</div>
+</div>
+
+<script>
+// If login page forwarded a username, prefill email/mobile (not required)
+const params = new URLSearchParams(window.location.search);
+const preid = params.get('student_id');
+if (preid) document.getElementById('email').value = '';
+
+document.getElementById('regForm').onsubmit = function(e) {
+  e.preventDefault();
+  const form = new FormData(this);
+
+  fetch('http://127.0.0.1:5000/admission', {
+    method: 'POST',
+    body: new URLSearchParams([...form])
+  })
+  .then(res => res.text())
+  .then(html => {
+    // The /admission endpoint returns an HTML response with student id and password
+    document.getElementById('result').innerHTML = html;
+  })
+  .catch(err => {
+    document.getElementById('result').innerText = 'Registration failed — check backend.';
+    console.error(err);
+  });
+}
+</script>
+
+</body>
+</html>

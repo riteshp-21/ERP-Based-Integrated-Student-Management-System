@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Admission Form</title>
+        <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="container nav">
+        <strong>ERP System</strong>
+        <nav style="margin-left:18px">
+            <a href="dashboard.html">Admin</a>
+            <a href="admission.html">Admission</a>
+            <a href="fee.html">Fee</a>
+            <a href="exam.html">Exam</a>
+            <a href="hostel.html">Hostel</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+
+<h2>Student Admission Form</h2>
+
+<form action="http://127.0.0.1:5000/admission" method="post">
+
+    Full Name: <br>
+    <input type="text" name="full_name" required><br><br>
+
+    Date of Birth: <br>
+    <input type="date" name="dob" required><br><br>
+
+    Gender: <br>
+    <select name="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+    </select><br><br>
+
+    Department: <br>
+    <input type="text" name="department" required><br><br>
+
+    Year: <br>
+    <input type="number" name="year" required><br><br>
+
+    Email: <br>
+    <input type="email" name="email"><br><br>
+
+    Mobile: <br>
+    <input type="text" name="mobile"><br><br>
+
+    <button type="submit">Submit</button>
+
+</form>
+
+<div class="footer">ERP Frontend • Simple demo UI</div>
+
+</div>
+</body>
+</html>

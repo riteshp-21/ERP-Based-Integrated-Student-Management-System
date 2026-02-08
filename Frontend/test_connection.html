@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            border-left: 4px solid green;
+            color: green;
+        }
+        .error {
+            border-left: 4px solid red;
+            color: red;
+        }
+        .info {
+            border-left: 4px solid blue;
+            color: blue;
+        }
+        .pending {
+            border-left: 4px solid orange;
+            color: orange;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Backend Connection Diagnostics</h1>
+    
+    <div class="test-box info">
+        <strong>Your Current Info:</strong>
+        <p>Frontend Origin: <code id="frontendOrigin"></code></p>
+        <p>Backend URL: <code id="backendUrl"></code></p>
+    </div>
+
+    <div class="test-box">
+        <strong>Test Results:</strong>
+        <div id="results"></div>
+    </div>
+
+    <button onclick="runTests()">Run All Tests</button>
+    <button onclick="testBackendDirect()">Test Backend Direct Access</button>
+    <button onclick="testCorsFetch()">Test CORS Fetch</button>
+
+    <script>
+        const BACKEND_URL = "http://127.0.0.1:5000";
+        
+        document.getElementById("frontendOrigin").textContent = window.location.origin;
+        document.getElementById("backendUrl").textContent = BACKEND_URL;
+
+        function log(test, status, message) {
+            const resultsDiv = document.getElementById("results");
+            const className = status === 'success' ? 'success' : status === 'error' ? 'error' : status === 'pending' ? 'pending' : 'info';
+            const statusIcon = status === 'success' ? '✓' : status === 'error' ? '✗' : '→';
+            
+            const testDiv = document.createElement("div");
+            testDiv.className = "test-box " + className;
+            testDiv.innerHTML = `<strong>${statusIcon} ${test}</strong><p>${message}</p>`;
+            resultsDiv.appendChild(testDiv);
+        }
+
+        function clearResults() {
+            document.getElementById("results").innerHTML = "";
+        }
+
+        async function testBackendDirect() {
+            clearResults();
+            log("Backend Direct Access", "pending", "Testing direct fetch to backend...");
+            
+            try {
+                const response = await fetch(BACKEND_URL + "/", {
+                    method: "GET",
+                    mode: "no-cors"  // Bypass CORS for initial test
+                });
+                log("Backend Direct Access", "success", "Backend is reachable at " + BACKEND_URL);
+            } catch (err) {
+                log("Backend Direct Access", "error", "Cannot reach backend: " + err.message);
+            }
+        }
+
+        async function testCorsFetch() {
+            clearResults();
+            log("CORS Fetch Test", "pending", "Testing CORS-enabled fetch...");
+            
+            try {
+                const response = await fetch(BACKEND_URL + "/auth_check", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {"Content-Type": "application/json"}
+                });
+                
+                if (response.status === 401) {
+                    log("CORS Fetch Test", "success", "CORS working! (Got 401 because not logged in - this is expected)");
+                } else {
+                    const data = await response.json();
+                    log("CORS Fetch Test", "success", "CORS working! Response: " + JSON.stringify(data));
+                }
+            } catch (err) {
+                log("CORS Fetch Test", "error", "CORS Fetch failed: " + err.message);
+            }
+        }
+
+        async function runTests() {
+            clearResults();
+
+            // Test 1: Backend Health
+            log("Step 1", "pending", "Checking if backend is running on port 5000...");
+            try {
+                const response = await fetch(BACKEND_URL + "/", {
+                    mode: "no-cors"
+                });
+                log("Backend Health Check", "success", "Backend is RUNNING at " + BACKEND_URL);
+            } catch (err) {
+                log("Backend Health Check", "error", "Backend is NOT RUNNING. Error: " + err.message);
+                return;
+            }
+
+            // Test 2: CORS Headers
+            log("Step 2", "pending", "Checking CORS headers...");
+            try {
+                const response = await fetch(BACKEND_URL + "/auth_check", {
+                    method: "GET",
+                    credentials: "include"
+                });
+                
+                const corsHeader = response.headers.get("Access-Control-Allow-Origin");
+                if (corsHeader) {
+                    log("CORS Headers", "success", "CORS enabled! Access-Control-Allow-Origin: " + corsHeader);
+                } else {
+                    log("CORS Headers", "info", "No CORS header (request blocked by same-origin policy or browser security)");
+                }
+            } catch (err) {
+                log("CORS Headers", "error", "CORS check failed: " + err.message);
+            }
+
+            // Test 3: Frontend Origin
+            log("Step 3", "info", "Your frontend is running at: " + window.location.origin);
+            log("Step 3", "info", "You are accessing from: " + window.location.href);
+
+            // Test 4: Test Login with Admin Creds
+            log("Step 4", "pending", "Testing login endpoint with admin credentials...");
+            try {
+                const response = await fetch(BACKEND_URL + "/login", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                    body: "username=admin&password=admin123",
+                    credentials: "include"
+                });
+
+                const data = await response.json();
+                if (data.status === "success") {
+                    log("Login Test", "success", "Login successful! Response: " + JSON.stringify(data));
+                } else {
+                    log("Login Test", "error", "Login failed. Response: " + JSON.stringify(data));
+                }
+            } catch (err) {
+                log("Login Test", "error", "Login test failed: " + err.message);
+            }
+
+            log("Tests Complete", "info", "If all tests passed, try <a href='login.html'>logging in again</a>");
+        }
+
+        // Auto-run on page load
+        window.onload = function() {
+            log("Info", "info", "Tests ready. Click 'Run All Tests' to diagnose the connection.");
+        };
+    </script>
+</body>
+</html>

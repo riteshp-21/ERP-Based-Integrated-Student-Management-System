@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cards {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            width: 220px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .card h3 { color: #007bff; margin: 0 0 10px 0; }
+        .card h2 { margin: 10px 0 0 0; font-size: 28px; color: #333; }
+    </style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <strong>ERP System - Admin</strong>
+    <nav style="margin-left:18px">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="admission.html">Admission</a>
+      <a href="fee.html">Fee</a>
+      <a href="exam.html">Exam</a>
+      <a href="hostel.html">Hostel</a>
+      <a href="login.html" onclick="logout(); return false;">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+    <div class="top-actions">
+        <button class="btn" onclick="logout()">Logout</button>
+    </div>
+
+    <h1>Admin Dashboard</h1>
+
+    <p id="loadingMsg" style="text-align:center; color:#666;">Loading dashboard...</p>
+
+    <!-- Add New Admission Button -->
+    <div style="margin-bottom:20px; text-align:center;">
+        <a href="admission.html">
+            <button class="btn">+ Add New Admission</button>
+        </a>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Total Students</h3>
+            <h2 id="students">0</h2>
+        </div>
+
+        <div class="card">
+            <h3>Total Fees Collected</h3>
+            <h2>₹ <span id="fees">0</span></h2>
+        </div>
+
+        <div class="card">
+            <h3>Hostel Occupancy</h3>
+            <h2 id="hostel">0</h2>
+        </div>
+    </div>
+
+    <div class="footer">ERP Frontend • Admin Dashboard</div>
+</div>
+
+<script>
+// Check authentication
+function checkAuth() {
+    fetch('http://127.0.0.1:5000/auth_check', {
+        credentials: 'include'
+    })
+    .then(res => {
+        if (res.status === 401) {
+            window.location.href = 'login.html';
+        }
+        return res.json();
+    })
+    .then(data => {
+        if (data.role !== 'admin') {
+            alert('Access denied: Admin role required');
+            window.location.href = 'login.html';
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        window.location.href = 'login.html';
+    });
+}
+
+function logout() {
+    fetch('http://127.0.0.1:5000/logout', {
+        method: 'POST',
+        credentials: 'include'
+    })
+    .then(() => {
+        localStorage.removeItem('current_user');
+        window.location.href = 'login.html';
+    })
+    .catch(err => {
+        console.error(err);
+        window.location.href = 'login.html';
+    });
+}
+
+function loadDashboard() {
+    fetch('http://127.0.0.1:5000/dashboard', {
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('loadingMsg').style.display = 'none';
+        document.getElementById('students').innerText = data.total_students;
+        document.getElementById('fees').innerText = data.total_fees;
+        document.getElementById('hostel').innerText = data.hostel_occupied;
+    })
+    .catch(err => {
+        document.getElementById('loadingMsg').innerText = 'Error loading dashboard. Check backend.';
+        console.error(err);
+    });
+}
+
+// On page load
+checkAuth();
+loadDashboard();
+setInterval(loadDashboard, 5000); // refresh every 5 seconds
+</script>
+
+</body>
+</html>
