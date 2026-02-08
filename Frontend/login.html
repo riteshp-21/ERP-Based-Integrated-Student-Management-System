@@ -27,23 +27,30 @@
     </nav>
 </header>
 
-<div class="container">
+<div class="container my-4">
 
-<h2>ERP Login</h2>
+<h2 class="mb-3">ERP Login</h2>
 
-<form id="loginForm" class="w-100" style="max-width:420px; margin:auto;">
-    Username:<br>
-    <input type="text" id="username" name="username" required><br><br>
+<form id="loginForm" class="mx-auto" style="max-width:420px;">
+    <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input class="form-control" type="text" id="username" name="username" required>
+    </div>
 
-    Password:<br>
-    <input type="password" id="password" name="password" required><br><br>
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="password" id="password" name="password" required>
+    </div>
 
-    <button type="submit" class="btn btn-primary">Login</button>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a href="admission.html" class="btn btn-outline-secondary">Back</a>
+    </div>
 </form>
 
-<p id="msg"></p>
+<p id="msg" class="mt-3"></p>
 
-<p id="registerLink" style="margin-top:8px"></p>
+<p id="registerLink" class="text-center mt-3"></p>
 
 <script>
 document.getElementById("loginForm").onsubmit = function(e) {
